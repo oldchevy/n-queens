@@ -156,6 +156,9 @@ window.countNRooksSolutions = function(n) {
   // };
 
 
+/*********************** TREE SOLUTION   *********************************/
+/*                                                                       */ 
+/* This solution doesn't do well past n=5                                */
 
   // var board = new Board({n: n});
 
