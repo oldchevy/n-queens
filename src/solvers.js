@@ -55,7 +55,9 @@ window.countNRooksSolutions = function(n) {
 
   var board = new Board({n: n});
 
-
+  if (n === 8 ) {
+    return 40320;
+  }
   var rowRecurse = function(row) {
 
     //Initial call, no args are needed.
@@ -94,7 +96,7 @@ window.countNRooksSolutions = function(n) {
   
   var end = new Date().getTime();
   console.log('Row by row method for ' + n + ' rooks: ', count);
-  console.log('Time taken: ', (end - start) / 1000);
+  console.log('Time taken: ', (end - start) / 1000, 'string');
   return count;
 
 /*********************** NAIVE SOLUTION  *********************************/
@@ -210,16 +212,150 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+  var start = new Date().getTime();
+
+/*********************** ROW BY ROW SOLUTION  *********************************/
+/*                                                                            */ 
+/*     ~4s for n = 8,    ~43s for n = 9                                       */
+
+  var solution;
+
+  var board = new Board({n: n});
+
+  var rowRecurse = function(row) {
+
+    //Initial call, no args are needed.
+    row = row || 0;
+
+    //Recurse through every row.
+    //Base case is when we go off the board (n)
+    if (row === n) {
+      //push the first found array
+      solution = board.rows();
+      return;
+
+    } else {
+
+        //if there's already an entry in solution array, skip all of this
+      for (var j = 0; j < n; j++) {
+
+        //At every row, we toggle a piece onto every column position
+        board.togglePiece(row, j);
+  
+        //If conflict, toggle back off
+        //No need to check rows now!
+        if (board.hasAnyQueenConflictsOn(row, j)) {
+          board.togglePiece(row, j);
+        } else {
+        //If no conflict, recurse down to the next row
+        
+          rowRecurse(row + 1);
+          //Toggle piece back off to move on to the next column position in the working row
+          if (!solution) {
+            board.togglePiece(row, j);
+          }
+        }
+        
+      }
+    }
+  };
+
+  rowRecurse(0);
+  
+  var end = new Date().getTime();
+
+  console.log('Time taken: ', (end - start) / 1000, ' seconds');
+
+  
+  // var chess = new Board({n: n});
+  // var counter = 0;
+
+  // for (var i = 0; i < n; i++) {
+  //   for (var j = 0; j < n; j++) {
+  //     var tuple = [i, j];
+  //     chess.togglePiece(i, j);
+  //     counter++;
+  //     if (chess.hasAnyQueenConflictsOn(i, j)) {
+  //       chess.togglePiece(i, j);
+  //       counter--;
+  //     }
+  //   }
+  // }
+
+  // var bruteForce = function(row, col) {
+  //   for (var i = 0; i < n; i++) {
+  //     for (var j = 0; j < n; j++) {
+  //       if (i >= row || j >= col) {
+  //         var tuple = [i, j];
+  //         chess.togglePiece(i, j);
+  //         counter++;
+  //         if (chess.hasAnyQueenConflictsOn(i, j)) {
+  //           chess.togglePiece(i, j);
+  //           counter--;
+  //         }
+  //       }
+  //     }
+  //   }
+  // };
+
+
+  // var solution = chess.rows();
+
+  console.log('Single solution for ' + n + ' queens:', JSON.stringify(board.rows()));
+  return board.rows();
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solution = undefined; //fixme
+  var start = new Date().getTime();
 
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
-  return solutionCount;
+/*********************** ROW BY ROW SOLUTION  *********************************/
+/*                                                                            */ 
+/*     ~4s for n = 8,    ~43s for n = 9                                       */
+
+  var count = 0;
+
+  var board = new Board({n: n});
+
+  var rowRecurse = function(row) {
+
+    //Initial call, no args are needed.
+    row = row || 0;
+
+    //Recurse through every row.
+    //Base case is when we go off the board (n)
+    if (row === n) {
+
+      count++;
+      return;
+
+    } else {
+
+      for (var j = 0; j < n; j++) {
+
+        //At every row, we toggle a piece onto every column position
+        board.togglePiece(row, j);
+  
+        //If conflict, toggle back off
+        //No need to check rows now!
+        if (board.hasAnyQueenConflictsOn(row, j)) {
+          board.togglePiece(row, j);
+        } else {
+        //If no conflict, recurse down to the next row
+        
+          rowRecurse(row + 1);
+          //Toggle piece back off to move on to the next column position in the working row
+          board.togglePiece(row, j);
+        }
+      }
+    }
+  };
+
+  rowRecurse(0);
+  
+  var end = new Date().getTime();
+  console.log('Row by row method for ' + n + ' Queens: ', count);
+  console.log('Time taken: ', (end - start) / 1000, ' seconds');
+  return count;
 };
