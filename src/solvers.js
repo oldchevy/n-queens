@@ -45,49 +45,123 @@ window.findNRooksSolution = function(n) {
 window.countNRooksSolutions = function(n) {
 
 
-  var solutionCount = [];
 
-  var topLevel = new Board({n: n});
+  // var solutionCount = [];
 
-  var findNextChild = function(board, rooks) {
+  // var topLevel = new Board({n: n});
 
-    rooks = rooks || 0;
+  // var findNextChild = function(board, rooks) {
 
-    if (rooks === n) {
+  //   //debugger;
 
-      _.each(solutionCount, function(unique) {
-        _.isEqual()
-      });
-      solutionCount.push(board.rows());
-      return;
-    }
+  //   //var board = new Board(nextboard);
 
-    for (var i = 0; i < n; i++) {
-      for (var j = 0; j < n; j++) {
-        if (!board.get(i)[j]) {
-          board.togglePiece(i, j);
-          if (board.hasRowConflictAt(i) || board.hasColConflictAt(j)) {
-            board.togglePiece(i, j);
-          } else {
-            var childBoard = new Board(board.rows());
-            findNextChild(childBoard, rooks + 1);
-            board.togglePiece(i, j);
-          }
+  //   rooks = rooks || 0;
+
+  //   if (rooks === n) {
+
+  //     // var bool = false;
+  //     // _.each(solutionCount, function(unique) {
+  //     //   if (!bool) {
+  //     //     bool = _.isEqual(unique, board.rows());
+  //     //   }
+  //     // });
+
+  //     //if (!bool) {
+  //     var solution = board.rows().slice();
+  //     console.log('Solution: ', solution);
+  //     solutionCount.push(solution);
+  //     //}
+  //   } else {
+
+  //     for (var i = 0; i < n; i++) {
+  //       for (var j = 0; j < n; j++) {
+  //         console.log('Board:', board.rows(), 'Indeces:', i, j, 'Level:', rooks);
+  //         if (!board.get(i)[j]) {
+  //           board.togglePiece(i, j);
+  //           if (board.hasRowConflictAt(i) || board.hasColConflictAt(j)) {
+  //             //board.togglePiece(i, j);
+  //           } else {
+  //             //var childBoard = new Board(board.rows());
+  //             findNextChild(board, rooks + 1);
+  //             console.log('After recursion:', board.rows(), 'Level:', rooks);
+  //             //board.togglePiece(i, j);
+  //           }
+  //         }
+  //       }
+  //     }
+
+      
+  //   }
+  //   //check every point, to see if it's a valid next move
+  //   //if it's a valid next move, recurse on that
+
+  // };
+  // //get all possible combinations of coordinates
+  // //Check each one with hasAnyRooksConflicts
+  // //increment count if it's correct
+
+  // findNextChild(topLevel);
+
+
+  // if (n === 1) {
+  //   return 1;
+  // }
+  // if (n === 2) {
+  //   return 2;
+  // }
+
+
+
+
+  var board = new Board({n: n});
+
+  var rows = board.rows();
+  // board.togglePiece(rowIndex, colIndex);
+  var findCoords = function() { // finds all available coords based on the current board
+    var coords = [];
+    rows.forEach(function(row, iRow) {
+      row.forEach(function(col, iCol) {
+        board.togglePiece(iRow, iCol);
+        if (!board.hasAnyRowConflicts() && !board.hasAnyColConflicts()) {
+          coords.push([iRow, iCol]);
         }
-      }
-    }
-    //check every point, to see if it's a valid next move
-    //if it's a valid next move, recurse on that
+        board.togglePiece(iRow, iCol);
+      });
+    });
+    return coords;
+  };
+
+  var paths = function(board){
+    
+    var tree = Tree(coord);
+    
+    var list = findCoords();
+    list.forEach(function(coord) {
+      tree.addChild(coord);
+    });
+
+    
 
   };
-  //get all possible combinations of coordinates
-  //Check each one with hasAnyRooksConflicts
-  //increment count if it's correct
 
-  findNextChild(topLevel);
 
+  board.togglePiece(1, 1);
+  console.log(findCoords([1, 1]));
+
+  var addRook = function() {
+    if (arguments.length === n) {
+      // check the coords in arguments to see if it works
+      // if it works, increment 1
+    }
+    board.togglePiece(0, 0);
+    var coords = findCoords();
+
+
+  // };
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  return solutionCount;
+  return solutionCount.length;
+
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
