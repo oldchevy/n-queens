@@ -43,7 +43,7 @@
 
     hasAnyQueenConflictsOn: function(rowIndex, colIndex) {
       return (
-        this.hasRowConflictAt(rowIndex) ||
+        //this.hasRowConflictAt(rowIndex) ||
         this.hasColConflictAt(colIndex) ||
         this.hasMajorDiagonalConflictAt(this._getFirstRowColumnIndexForMajorDiagonalOn(rowIndex, colIndex)) ||
         this.hasMinorDiagonalConflictAt(this._getFirstRowColumnIndexForMinorDiagonalOn(rowIndex, colIndex))
@@ -115,13 +115,24 @@
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
       var table = this.rows();
-      var count = table.filter(function(row) {
-        return row[colIndex] !== 0;
-      });
-      if (count.length > 1) {
-        return true;
+      var count = 0;
+      for (var i = 0; i < this.get('n'); i++) {
+        count += table[i][colIndex];
+        if (count > 1) {
+          return true;
+          break;
+        }
       }
+
       return false;
+
+      // var count = table.filter(function(row) {
+      //   return row[colIndex] !== 0;
+      // });
+      // if (count.length > 1) {
+      //   return true;
+      // }
+      // return false;
     },
 
     // test if any columns on this board contain conflicts
@@ -144,23 +155,44 @@
     //
     // test if a specific major diagonal on this board contains a conflict
     hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow) {
-      var counter = 0;
-      var table = this.rows();
-      var col = majorDiagonalColumnIndexAtFirstRow;
-      var coords = []; // coordinates that lie on the diagonal
-      for (var row = 0; row < this.get('n'); row++) {
-        if (col >= 0) {
-          coords.push([row, col]);
+      
+      var board = this.rows();
+      var bool = false;
+      var count = 0;
+      var rowIndex = -1 * Math.min(0, majorDiagonalColumnIndexAtFirstRow);
+      var colIndex = Math.max(0, majorDiagonalColumnIndexAtFirstRow);
+
+
+      while (this._isInBounds(rowIndex, colIndex)) {
+        count += board[rowIndex][colIndex];
+        if (count > 1) {
+          bool = true;
+          break;
         }
-        col++;
+        rowIndex += 1;
+        colIndex += 1;
       }
-      coords.forEach(function(coord) { // check if more than 1 thing on the diagonal
-        if (table[coord[0]][coord[1]] === 1) {
-          counter++;
-        }
-      });
-      if (counter > 1) { return true; }
-      return false;
+
+      return bool;
+
+
+      // var counter = 0;
+      // var table = this.rows();
+      // var col = majorDiagonalColumnIndexAtFirstRow;
+      // var coords = []; // coordinates that lie on the diagonal
+      // for (var row = 0; row < this.get('n'); row++) {
+      //   if (col >= 0) {
+      //     coords.push([row, col]);
+      //   }
+      //   col++;
+      // }
+      // coords.forEach(function(coord) { // check if more than 1 thing on the diagonal
+      //   if (table[coord[0]][coord[1]] === 1) {
+      //     counter++;
+      //   }
+      // });
+      // if (counter > 1) { return true; }
+      // return false;
     },
 
     // test if any major diagonals on this board contain conflicts
@@ -181,23 +213,44 @@
     //
     // test if a specific minor diagonal on this board contains a conflict
     hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow) {
-      var counter = 0;
-      var table = this.rows();
-      var col = minorDiagonalColumnIndexAtFirstRow;
-      var coords = [];
-      for (var row = 0; row < this.get('n'); row++) {
-        if (col >= 0 && col < this.get('n')) {
-          coords.push([row, col]);
+
+      var board = this.rows();
+      var bool = false;
+      var count = 0;
+      var size = this.get('n') - 1;
+      var rowIndex = Math.min(size, minorDiagonalColumnIndexAtFirstRow);
+      var colIndex = Math.max(0, minorDiagonalColumnIndexAtFirstRow - rowIndex);
+
+
+      while (this._isInBounds(rowIndex, colIndex)) {
+        count += board[rowIndex][colIndex];
+        if (count > 1) {
+          bool = true;
+          break;
         }
-        col--;
+        rowIndex -= 1;
+        colIndex += 1;
       }
-      coords.forEach(function(coord) {
-        if (table[coord[0]][coord[1]] === 1) {
-          counter++;
-        }
-      });
-      if (counter > 1) { return true; }
-      return false;
+
+      return bool;
+
+      // var counter = 0;
+      // var table = this.rows();
+      // var col = minorDiagonalColumnIndexAtFirstRow;
+      // var coords = [];
+      // for (var row = 0; row < this.get('n'); row++) {
+      //   if (col >= 0 && col < this.get('n')) {
+      //     coords.push([row, col]);
+      //   }
+      //   col--;
+      // }
+      // coords.forEach(function(coord) {
+      //   if (table[coord[0]][coord[1]] === 1) {
+      //     counter++;
+      //   }
+      // });
+      // if (counter > 1) { return true; }
+      // return false;
     },
 
     // test if any minor diagonals on this board contain conflicts

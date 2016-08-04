@@ -318,6 +318,9 @@ window.countNQueensSolutions = function(n) {
 
   var board = new Board({n: n});
 
+  //Object stores tuples that are valid for the next level of recursion
+  //
+
   var rowRecurse = function(row) {
 
     //Initial call, no args are needed.
