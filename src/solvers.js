@@ -16,7 +16,26 @@
 
 
 window.findNRooksSolution = function(n) {
-  var solution = undefined; //fixme
+  // per row, put a rook at an [row, col] coord
+  // the next place to put a rook must pass row/col tests given the [row, col] restrictions
+  // recurse
+
+  var chess = new Board({n: n});
+  var counter = 0;
+
+  for (var i = 0; i < n; i++) {
+    for (var j = 0; j < n; j++) {
+      var tuple = [i, j];
+      chess.togglePiece(i, j);
+      counter++;
+      if ((chess.hasRowConflictAt(i) || chess.hasColConflictAt(j))) {
+        chess.togglePiece(i, j);
+        counter--;
+      }
+    }
+  }
+
+  var solution = chess.rows();
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
@@ -24,7 +43,48 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solution = undefined; //fixme
+
+
+  var solutionCount = [];
+
+  var topLevel = new Board({n: n});
+
+  var findNextChild = function(board, rooks) {
+
+    rooks = rooks || 0;
+
+    if (rooks === n) {
+
+      _.each(solutionCount, function(unique) {
+        _.isEqual()
+      });
+      solutionCount.push(board.rows());
+      return;
+    }
+
+    for (var i = 0; i < n; i++) {
+      for (var j = 0; j < n; j++) {
+        if (!board.get(i)[j]) {
+          board.togglePiece(i, j);
+          if (board.hasRowConflictAt(i) || board.hasColConflictAt(j)) {
+            board.togglePiece(i, j);
+          } else {
+            var childBoard = new Board(board.rows());
+            findNextChild(childBoard, rooks + 1);
+            board.togglePiece(i, j);
+          }
+        }
+      }
+    }
+    //check every point, to see if it's a valid next move
+    //if it's a valid next move, recurse on that
+
+  };
+  //get all possible combinations of coordinates
+  //Check each one with hasAnyRooksConflicts
+  //increment count if it's correct
+
+  findNextChild(topLevel);
 
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
