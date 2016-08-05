@@ -314,51 +314,99 @@ window.countNQueensSolutions = function(n) {
 /*                                                                            */ 
 /*     ~4s for n = 8,    ~43s for n = 9                                       */
 
+  // var count = 0;
+
+  // var board = new Board({n: n});
+
+  // //Object stores tuples that are valid for the next level of recursion
+  // //
+
+  // var rowRecurse = function(row) {
+
+  //   //Initial call, no args are needed.
+  //   row = row || 0;
+
+  //   //Recurse through every row.
+  //   //Base case is when we go off the board (n)
+  //   if (row === n) {
+
+  //     count++;
+  //     return;
+
+  //   } else {
+
+  //     for (var j = 0; j < n; j++) {
+
+  //       //At every row, we toggle a piece onto every column position
+  //       board.togglePiece(row, j);
+  
+  //       //If conflict, toggle back off
+  //       //No need to check rows now!
+  //       if (board.hasAnyQueenConflictsOn(row, j)) {
+  //         board.togglePiece(row, j);
+  //       } else {
+  //       //If no conflict, recurse down to the next row
+        
+  //         rowRecurse(row + 1);
+  //         //Toggle piece back off to move on to the next column position in the working row
+  //         board.togglePiece(row, j);
+  //       }
+  //     }
+  //   }
+  // };
+
+  // rowRecurse(0);
+  
+  // var end = new Date().getTime();
+  // console.log('Row by row method for ' + n + ' Queens: ', count);
+  // console.log('Time taken: ', (end - start) / 1000, ' seconds');
+  // return count;
+
+
+
+/*********************** BITWISE ROW BY ROW SOLUTION  *********************************/
+/*                                                                                    */ 
+/*     ~4s for n = 8,    ~43s for n = 9                                               */
+
+  //This represents the done state in binary, when columns will be all 1's (all queens placed successfully)
+  //Ex: n=4, 2^4 = 16 = 10000, 2^4 - 1 = 15 = 1111  
+
+  var done = Math.pow(2, n) - 1;
+  console.log(done, count); 
   var count = 0;
 
-  var board = new Board({n: n});
+  //A queen conflict is denoted with a 1 bit
+  var nextRow = function(majorDiag, minorDiag, columns) {
 
-  //Object stores tuples that are valid for the next level of recursion
-  //
-
-  var rowRecurse = function(row) {
-
-    //Initial call, no args are needed.
-    row = row || 0;
-
-    //Recurse through every row.
-    //Base case is when we go off the board (n)
-    if (row === n) {
-
+    //Base case when a queen is placed at every column
+    if (columns === done) {
       count++;
       return;
-
-    } else {
-
-      for (var j = 0; j < n; j++) {
-
-        //At every row, we toggle a piece onto every column position
-        board.togglePiece(row, j);
-  
-        //If conflict, toggle back off
-        //No need to check rows now!
-        if (board.hasAnyQueenConflictsOn(row, j)) {
-          board.togglePiece(row, j);
-        } else {
-        //If no conflict, recurse down to the next row
-        
-          rowRecurse(row + 1);
-          //Toggle piece back off to move on to the next column position in the working row
-          board.togglePiece(row, j);
-        }
-      }
     }
+
+    //Available positions are now marked with a 1 (we flipped from prev notation)
+    //The flip actually yields a negative 32 bit number, which is why we need available & done
+    //You just want to check the n binary digits you're working with, but a negative number 
+    // represented as 11111111110000 would never evaluate to false until compared with 000000001111
+    var available = ~(majorDiag | minorDiag | columns);
+
+    //Will stop loop when no available positions left (0000)
+    while (available & done) {
+      var nextBit = available & -available;
+      available -= nextBit;
+
+      nextRow((majorDiag|nextBit)>>1, (minorDiag|nextBit)<<1, columns|nextBit);
+
+    }
+
+
   };
 
-  rowRecurse(0);
-  
+  nextRow(0, 0, 0);
+
   var end = new Date().getTime();
-  console.log('Row by row method for ' + n + ' Queens: ', count);
-  console.log('Time taken: ', (end - start) / 1000, ' seconds');
+  console.log('Bitwise method for ' + n + ' Queens: ', count);
+  console.log('Time taken: ', (end - start), ' milliseconds');
   return count;
+
 };
